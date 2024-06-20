@@ -1,0 +1,107 @@
+---
+title: "In-class code Supreme Court Database (HW3)"
+author: "Sabrina Nardin"
+date: 6/20/2024
+output: html_document
+---
+
+Load the libraries
+```{r}
+library(tidyverse)
+```
+
+Load the data using `read_csv()` and a relative path (notice the two data frames are located in the "data" folder). You only need to modify the file argument of this function. Label the imported data as `scdb_case` and `scdb_vote`
+```{r}
+scdb_case <- read_csv("data/scdb-case.csv")
+scdb_vote <- read_csv("data/scdb-vote.csv")
+```
+
+Explore the data using functions such as `head`, `View`, `summary`, `glimpse`, etc. or any other suitable functions 
+```{r}
+#View(scdb_case)
+#View(scdb_vote)
+
+glimpse(scdb_case)
+glimpse(scdb_vote)
+```
+
+Today in class, we will explore an example similar to HW3 questions. But first, let's demonstrate the use of the `relocate()` function that we discussed in previous lectures. `relocate()` moves variables to the front of a dataframe.  You will find this trick useful for large dataframes like those in HW3. For example, the code below moves the `majVotes` and `minVotes` variables to the front of the `scdb_case` dataset:
+```{r}
+scdb_case %>% relocate(majVotes, minVotes)
+# remember to save this in a new df if you want to retain this order
+```
+
+
+In-class example: finding and filtering the Justices who decided the landmark *Brown v. Board of Education* case. How can we approach this task?
+
+First, we need to identify which data to use: the answer is both! The name of the justices are in `scdb_vote`, while the name of the case is in `scdb_case`. In the actual homework, there is only one question (in task 3) for which is essential to join the two dataframes; however, you might also consider joining data for the open question of task 3! 
+
+Check the documentation: http://scdb.wustl.edu/documentation.php?s=1
+
+Find the name of the justices: there are three different methods to code this
+```{r}
+# 1 with group_by and summarize (longest)
+scdb_vote %>%
+  group_by(justice, justiceName) %>%
+  summarize(count = n()) %>% 
+  print(n = 117)  
+
+# run this code in the console to see full output with the 117 justices
+# in the actual homework, please do not submit long outputs (comment it out)! we do not need it :) 
+```
+
+
+```{r}
+# 2 with count (notice count() automatically reorders rows)
+scdb_vote %>% count(justice, justiceName) %>% print(n = 117)
+```
+
+```{r}
+# 3 with distinct (most straightforward)
+scdb_vote %>% distinct(justice, justiceName)
+```
+
+Find the name of the case in the data (there are a lot of cases in this data frame: opening the data and scrolling through it  manually, like in Excel. is possible but not efficient; instead we can use R to help us restricting our search):
+```{r}
+# select(penguins, start_with("bill"))
+
+# filter with criteria
+scdb_case %>%
+  relocate(caseName) %>%
+  filter(str_starts(caseName, "BROWN"))
+
+# search until you find the match and use it in next code (regular expressions with stringr will refine the search, we learn them later in the course)
+```
+
+
+```{r}
+# this is the case we want: "BROWN et al. v. BOARD OF EDUCATION OF TOPEKA et al."
+scdb_case %>% relocate(caseName) %>% filter(caseName == "BROWN et al. v. BOARD OF EDUCATION OF TOPEKA et al.")
+```
+
+
+Join the two dataframes:
+```{r}
+j <- scdb_case %>% 
+  inner_join(scdb_vote)
+```
+
+
+And check who voted in the Brown case using the joined data:
+Compare and double-check: https://www.nps.gov/brvb/learn/historyculture/justices.htm#:~:text=The%20nine%20justices%20serving%20on,no%20place%20in%20public%20schools.
+```{r}
+j %>% 
+  relocate(caseName, justice, justiceName) %>% 
+  filter(caseName == "BROWN et al. v. BOARD OF EDUCATION OF TOPEKA et al.") %>%
+  distinct(caseName, justice, justiceName)
+```
+
+
+Finally, extract only the subset of justices who voted in that case. You can do it in two ways: `filter()` using the variable `justiceName` or with the variable `justice`
+```{r}
+# filter by justiceName
+j %>% filter(justiceName %in% c("HLBlack", "WODouglas", "EWarren")) # add all justices who voted in that case
+
+# filter by justice
+j %>% filter(justice %in% c(78, 81, 90)) # add here all justices who voted in that case
+```
