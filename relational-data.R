@@ -15,8 +15,7 @@ library(tidyverse)
 # step 1: 
 # inspect the data frames -- which variables do you need to solve the problem?
 # this is a key step, spend some time looking at these two tables and the variables they have in common 
-glimpse(flights)
-glimpse(planes)
+
 
 # step 2: 
 # use mutate() and the appropriate variables to calculate age using the planes table 

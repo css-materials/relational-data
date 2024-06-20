@@ -2,7 +2,7 @@
 # Ch. 13 (1st Ed) https://r4ds.had.co.nz/relational-data.html#nycflights13-relational
 # Ch. 19 (2nd Ed) https://r4ds.hadley.nz/joins
 
-# run line 5 if nycflights13 is not already installed
+# uncomment and run if nycflights13 is not already installed
 # install.packages("nycflights13")
 
 # load required packages
