@@ -1,5 +1,6 @@
-# PRACTICE WORKING WITH RELATIONAL DATA - SOLUTOINS
-# see Chapter 13 https://r4ds.had.co.nz/relational-data.html#nycflights13-relational
+# PRACTICE WORKING WITH RELATIONAL DATA - SOLUTIONS
+# Ch. 13 (1st Ed) https://r4ds.had.co.nz/relational-data.html#nycflights13-relational
+# Ch. 19 (2nd Ed) https://r4ds.hadley.nz/joins
 
 # run line 5 if nycflights13 is not already installed
 # install.packages("nycflights13")
@@ -11,7 +12,8 @@ library(tidyverse)
 
 # QUESTION 1. Is there a relationship between the age of a plane and its departure delays?
 
-# step 1: inspect the data frames -- which variables do you need to solve the problem?
+# step 1: 
+# inspect the data frames -- which variables do you need to solve the problem?
 # this is a key step, spend some time looking at these two tables and the variables they have in common
 glimpse(flights)
 glimpse(planes)
@@ -34,24 +36,26 @@ flights %>%
 
 
 
-# QUESTION 2. Add the location of the origin and destination (i.e. the `lat` and `lon`) to `flights`
-
-# step 1: inspect the data frames -- which variables do you need to solve the problem?
-# this is a key step, spend some time looking at these two tables and the variables they have in common 
+# QUESTION 2. Imagine you wanted to draw the route each plane flies from its origin to its destination. 
+# What variables would you need? What tables would you need to combine?
+  
+# step 1: inspect the data frames 
 glimpse(flights)
 glimpse(airports)
 
-# step 2: select only the necessary columns from airports, save them in airports_lite
-airports_lite <- airports %>%
-  select(faa, lat, lon)
-airports_lite
-
-# step 3: combine the columns using left_join()
-# specify the names of the matching columns, and distinguish destination from origin
-# save your results in a new data frame
-# hint: to distinguish destination from origin you need to add the suffix argument
-# see https://dplyr.tidyverse.org/reference/mutate-joins.html
-joined <- flights %>%
-  left_join(y = airports_lite, by = c(dest = "faa")) %>%
-  left_join(y = airports_lite, by = c(origin = "faa"), suffix = c(".dest", ".origin"))
-
+# step 2: 
+# we need lat and lon of both the origin and destination airports of each flight. 
+# thus we need the flights table (which has `origin` and `dest` of each flight)
+# and the  airports tables (which has `lon` and `lat` of each airport)
+# To get the lat and lon for the origin and destination of each flight, we need two joins for flights to airports:
+# once for the lat and lon of the origin airport, and once for the lat and lon of the destination airport.
+# inner_join() to drop any flights with missing airports, can also use left_join()
+flights_latlon <- flights %>%
+  inner_join(select(airports, 
+                    origin = faa, 
+                    origin_lat = lat, 
+                    origin_lon = lon), by = "origin") %>%
+  inner_join(select(airports, 
+                    dest = faa, 
+                    dest_lat = lat, 
+                    dest_lon = lon), by = "dest")
