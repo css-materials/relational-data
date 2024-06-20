@@ -14,20 +14,23 @@ library(tidyverse)
 
 # step 1: 
 # inspect the data frames -- which variables do you need to solve the problem?
-# this is a key step, spend some time looking at these two tables and the variables they have in common
+# this is a key step, spend some time looking at the tables and the variables they have in common 
+# refer back to the slides or to Ch. 19 from our book (link at the top of this file) for details
 glimpse(flights)
 glimpse(planes)
 
 # step 2: 
 # use mutate() and the appropriate variables to calculate age using the planes table 
 # then select the required variables from the planes table
+# hint: you will notice that there is not an age variable in the data, but we can calculate it:
+# this data is from 2013: we can use this info together with the variable year to calculate age
 plane_ages <- planes %>%
     mutate(age = 2013 - year) %>%
     select(tailnum, age)
 plane_ages
 
 # step 3: 
-# use inner_join() to combine the data frames (flights and plane_ages)
+# use inner_join() to combine the data frames 
 # generate a graph to shows the relationship between the required variables
 # use a smoothing line with geom_smooth()
 flights %>%
