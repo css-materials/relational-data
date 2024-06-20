@@ -28,7 +28,8 @@ plane_ages
 
 # step 3: 
 # use inner_join() to combine the data frames (flights and plane_ages)
-# generate a graph to shows the relationship between the required variables, use a smoothing line geom
+# generate a graph to shows the relationship between the required variables
+# use a smoothing line with geom_smooth()
 flights %>%
   inner_join(y = plane_ages) %>%
   ggplot(mapping = aes(x = age, y = dep_delay)) +
@@ -44,11 +45,11 @@ glimpse(flights)
 glimpse(airports)
 
 # step 2: 
-# we need lat and lon of both the origin and destination airports of each flight. 
-# thus we need the flights table (which has `origin` and `dest` of each flight)
-# and the  airports tables (which has `lon` and `lat` of each airport)
-# To get the lat and lon for the origin and destination of each flight, we need two joins for flights to airports:
-# once for the lat and lon of the origin airport, and once for the lat and lon of the destination airport.
+# we need lat and lon of both the origin and destination airports of each flight, thus we need: 
+# the flights table (which has `origin` and `dest` of each flight)
+# and the airports table (which has `lon` and `lat` of each airport)
+# to get the lat and lon for the origin and destination of each flight, we need two joins for flights to airports:
+# once for the lat and lon of the origin airport, and once for the lat and lon of the destination airport
 # inner_join() to drop any flights with missing airports, can also use left_join()
 flights_latlon <- flights %>%
   inner_join(select(airports, 
