@@ -1,0 +1,68 @@
+---
+title: "In-class code Supreme Court Database (from HW3)"
+author: "Sabrina Nardin"
+date: "10/16/2024"
+output: html_document
+---
+
+In this demo we review today's content by demonstrating how to load HW3 data and by answering a question similar to HW3 questions. 
+
+DATA: The [Supreme Court Database](http://scdb.wustl.edu/) contains detailed information of every published decision of the U.S. Supreme Court since its creation in 1791. We work with two data files:
+
+`scdb-case.csv` with all *case-level* variables, whereas `scdb-vote.csv` with all *vote-level* variables.
+
+Data [documentation](http://scdb.wustl.edu/documentation.php)
+
+Load the libraries
+```{r, message = FALSE}
+library(tidyverse)
+```
+
+Load the data using `read_csv()` and a relative path (note the two data frames are located in the "data" folder). Label the imported data as `scdb_case` and `scdb_vote`
+```{r}
+
+```
+
+Explore the data 
+```{r}
+
+```
+
+
+OUR TASK TODAY: Find and filter the Justices who decided the landmark *Brown v. Board of Education* case. 
+
+How can we approach this task? As usual... in steps!
+
+
+First, we need to identify which dataset to use: the answer is both. Why? We can think at these two as relational tables: name of the justices are in `scdb_vote`, while the name of the case is in `scdb_case` 
+
+
+Second, we need to find the name of the justices in the data:
+```{r}
+
+```
+
+
+Third, we need to find the name of the case in the data. 
+There are a lot of cases in this data frame: opening the data and scrolling through it  manually, like in Excel, it is not a good idea! Hint: we need this case `"BROWN et al. v. BOARD OF EDUCATION OF TOPEKA et al."` but let's see how we can proceed to find it.
+```{r}
+
+```
+
+
+Fourth, we join the two dataframes:
+```{r}
+
+```
+
+
+Fifth, we can check who voted in the Brown case using the joined data (double-check: https://www.nps.gov/brvb/learn/historyculture/justices.htm#:~:text=The%20nine%20justices%20serving%20on,no%20place%20in%20public%20schools)
+```{r}
+
+```
+
+
+Finally, extract only the subset of justices who voted in that specific case. 
+```{r}
+
+```

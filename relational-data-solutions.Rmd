@@ -1,0 +1,82 @@
+---
+title: "Practice working with relational data -- Solutions"
+output: html_document
+date: "2024-10-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Resources:
+
+* Ch. 13 (1st Ed) https://r4ds.had.co.nz/relational-data.html#nycflights13-relational
+* Ch. 19 (2nd Ed) https://r4ds.hadley.nz/joins
+
+Load required packages:
+```{r, message = FALSE}
+library(nycflights13)
+library(tidyverse)
+```
+
+
+## QUESTION 1. Is there a relationship between the age of a plane and its departure delays?
+
+We can answer this question by breaking it down into steps
+
+Step 1: 
+Look at the data frames: which tables and variables do you need to solve the problem?
+Spend some time looking at the tables and variables they have in common and identify those you need to answer the question
+```{r}
+nycflights13::flights
+nycflights13::planes
+glimpse(flights)
+glimpse(planes)
+```
+
+Step 2: 
+The question asks you to use "age of a plane" but from step 1 you might have noticed there is no an "age" variable in the data.
+You need to create it first: use the correct dplyr verb and the appropriate variables from the planes table, to calculate age. Hint: this data is from 2013... use this info together with the variable year to calculate the age of a plane age
+Finally, `select()` the variables you need to answer the question
+```{r}
+plane_ages <- planes %>%
+    mutate(age = 2013 - year) %>%
+    select(tailnum, age)
+plane_ages
+```
+
+Step 3: 
+Use `inner_join()` to combine the required tables and generate a ggplot graph to shows the relationship between the required variables, use a smoothing line with `geom_smooth()`
+```{r}
+flights %>%
+  inner_join(y = plane_ages) %>%
+  ggplot(mapping = aes(x = age, y = dep_delay)) +
+  geom_smooth()
+```
+
+
+## QUESTION 2. Imagine you wanted to draw the route each plane flies from its origin to its destination. What variables would you need? What tables would you need to combine?
+  
+Step 1: 
+Inspect the tables
+```{r}
+glimpse(flights)
+glimpse(airports)
+```
+
+Step 2: 
+We need lat and lon of both the origin and destination airports of each flight, thus we need: the flights table (which has `origin` and `dest` of each flight), and the airports table (which has `lon` and `lat` of each airport)
+Now, to get the lat and lon for the origin and destination of each flight, we need to perform two joins for flights to airports: once for the lat and lon of the origin airport, and once for the lat and lon of the destination airport
+```{r}
+flights_latlon <- flights %>%
+  inner_join(select(airports, 
+                    origin = faa, 
+                    origin_lat = lat, 
+                    origin_lon = lon), by = "origin") %>%
+  inner_join(select(airports, 
+                    dest = faa, 
+                    dest_lat = lat, 
+                    dest_lon = lon), by = "dest")
+```
+
+Notice inner_join() drops any flights with missing airports, can also use left_join() here
